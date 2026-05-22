@@ -1,0 +1,50 @@
+# Default owners for the entire repository
+* @quantumworld-dpdns-io
+
+# CRDT core — ownership by swarm coordination team
+/src/rover_swarm/crdt/ @quantumworld-dpdns-io
+
+# Communication protocols
+/src/rover_swarm/communication/ @quantumworld-dpdns-io
+
+# Swarm coordination algorithms
+/src/rover_swarm/swarm/ @quantumworld-dpdns-io
+
+# AI inference engines
+/src/rover_swarm/ai/ @quantumworld-dpdns-io
+
+# Security and authentication
+/src/rover_swarm/security/ @quantumworld-dpdns-io
+
+# API layer
+/src/rover_swarm/api/ @quantumworld-dpdns-io
+
+# Vector database integrations
+/src/rover_swarm/vector_db/ @quantumworld-dpdns-io
+
+# Sensor abstraction and drivers
+/src/rover_swarm/sensor/ @quantumworld-dpdns-io
+
+# Observability and monitoring
+/src/rover_swarm/observability/ @quantumworld-dpdns-io
+
+# Simulation
+/src/rover_swarm/simulation/ @quantumworld-dpdns-io
+
+# Tests
+/tests/ @quantumworld-dpdns-io
+
+# CI/CD and infrastructure
+/.github/ @quantumworld-dpdns-io
+
+# Docker and containerization
+/Dockerfile @quantumworld-dpdns-io
+/docker-compose.yml @quantumworld-dpdns-io
+
+# Documentation
+/docs/ @quantumworld-dpdns-io
+
+# Security-related changes
+**/security/** @quantumworld-dpdns-io
+**/auth* @quantumworld-dpdns-io
+**/tls* @quantumworld-dpdns-io
