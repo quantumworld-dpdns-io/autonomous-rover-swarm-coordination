@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 
 
-class ObstacleType(str, Enum):
+class ObstacleType(StrEnum):
     ROCK = "rock"
     CRATER = "crater"
     WATER = "water"
