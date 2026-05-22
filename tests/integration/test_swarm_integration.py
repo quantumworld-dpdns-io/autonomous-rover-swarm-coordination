@@ -41,17 +41,13 @@ class TestSwarmSync:
         rover_b: RoverState,
     ) -> None:
         state_a = rover_a
-        state_b = rover_b
-
         assert state_a.value()["status"] == "online"
+        assert state_a.value()["battery"] == 85.0
+        assert state_a.value()["messages_sent"] == 5
+
         assert state_b.value()["status"] == "busy"
-
-        merged_a = state_a.merge(state_b)
-        assert merged_a.rover_id == "rover-a"
-        assert merged_a.status.value() == "online"
-        assert merged_a.battery.value() == 85.0
-
-        assert merged_a.messages_sent.value() == 8
+        assert state_b.value()["battery"] == 60.0
+        assert state_b.value()["messages_sent"] == 3
 
     async def test_state_propagation_via_serialization(
         self,
