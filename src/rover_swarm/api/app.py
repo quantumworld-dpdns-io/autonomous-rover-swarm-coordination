@@ -29,11 +29,19 @@ except ImportError:
 
 
 REQUEST_COUNT = (
-    Counter("rover_swarm_http_requests_total", "Total HTTP requests", ["method", "endpoint", "status"])
+    Counter(
+        "rover_swarm_http_requests_total",
+        "Total HTTP requests",
+        ["method", "endpoint", "status"],
+    )
     if PROMETHEUS_AVAILABLE else None
 )
 REQUEST_LATENCY = (
-    Histogram("rover_swarm_http_request_duration_seconds", "HTTP request latency", ["method", "endpoint"])
+    Histogram(
+        "rover_swarm_http_request_duration_seconds",
+        "HTTP request latency",
+        ["method", "endpoint"],
+    )
     if PROMETHEUS_AVAILABLE else None
 )
 ACTIVE_CONNECTIONS = (
