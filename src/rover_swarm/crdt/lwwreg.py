@@ -11,7 +11,7 @@ from rover_swarm.crdt.vector_clock import VectorClock
 from rover_swarm.exceptions import CrdtMergeError
 
 
-class LwwReg(Crdt, Generic[Any]):
+class LwwReg(Crdt):
     """Last-Writer-Wins Register CRDT.
 
     Resolves concurrent writes by timestamp: the most recent write wins.
