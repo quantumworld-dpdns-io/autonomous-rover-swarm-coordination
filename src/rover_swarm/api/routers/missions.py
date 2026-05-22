@@ -139,7 +139,10 @@ async def update_mission(
     planner = _get_planner()
     mission = planner.get_mission(mission_id)
     if mission is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Mission {mission_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Mission {mission_id} not found",
+        )
     if body.name is not None:
         mission.name.set(body.name)
     if body.phase is not None:
