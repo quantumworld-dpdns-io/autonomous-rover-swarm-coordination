@@ -176,7 +176,8 @@ def generate_random_terrain(
                 if 0 <= ni < rows and 0 <= nj < cols:
                     dist = math.hypot(di, dj)
                     if dist <= trav_radius:
-                        traversability[ni, nj] = max(0.0, traversability[ni, nj] - 0.5 * (1.0 - dist / trav_radius))
+                        decay = 0.5 * (1.0 - dist / trav_radius)
+                        traversability[ni, nj] = max(0.0, traversability[ni, nj] - decay)
 
     return TerrainMap(
         elevation=elevation,
