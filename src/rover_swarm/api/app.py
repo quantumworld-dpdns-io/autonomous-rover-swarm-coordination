@@ -52,7 +52,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 app = FastAPI(
     title="Rover Swarm Coordination API",
-    description="Autonomous rover swarm coordination platform using CRDTs for decentralized coordination in hostile environments.",
+    description=(
+        "Autonomous rover swarm coordination platform using CRDTs "
+        "for decentralized coordination in hostile environments."
+    ),
     version="0.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
