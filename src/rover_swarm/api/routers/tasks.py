@@ -109,7 +109,9 @@ async def update_task_status(
     engine = _get_engine()
     task = engine._tasks.get(task_id)  # type: ignore[attr-defined]
     if task is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task {task_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Task {task_id} not found"
+        )
 
     if body.status is not None:
         new_status = TaskStatus(body.status)

@@ -34,7 +34,9 @@ async def get_rover_telemetry(
 ) -> TelemetryResponse:
     rover = state.get_rover(rover_id)
     if rover is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Rover {rover_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Rover {rover_id} not found"
+        )
 
     rv = rover.value()
     sample = TelemetrySample(
