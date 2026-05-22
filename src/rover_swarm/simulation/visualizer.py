@@ -75,11 +75,11 @@ class SwarmVisualizer:
         paths: dict[RoverId, list[Position]] | None = None,
         communication_links: list[tuple[RoverId, RoverId]] | None = None,
         obstacles: list[tuple[float, float, float]] | None = None,
-        metadata: dict[RoverId, dict[str, Any]] | None = None,
+        _metadata: dict[RoverId, dict[str, Any]] | None = None,
     ) -> bool:
         if self._backend == "pygame":
-            return self._render_pygame(positions, paths, communication_links, obstacles, metadata)
-        return self._render_matplotlib(positions, paths, communication_links, obstacles, metadata)
+            return self._render_pygame(positions, paths, communication_links, obstacles)
+        return self._render_matplotlib(positions, paths, communication_links, obstacles)
 
     def _render_pygame(
         self,
@@ -87,7 +87,6 @@ class SwarmVisualizer:
         paths: dict[RoverId, list[Position]] | None,
         communication_links: list[tuple[RoverId, RoverId]] | None,
         obstacles: list[tuple[float, float, float]] | None,
-        metadata: dict[RoverId, dict[str, Any]] | None,
     ) -> bool:
         if self._pygame is None or self._screen is None:
             return False
