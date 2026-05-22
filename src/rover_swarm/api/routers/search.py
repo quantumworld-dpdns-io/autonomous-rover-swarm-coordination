@@ -70,7 +70,7 @@ async def vector_search(
         return VectorSearchResponse(backend=backend_used, results=results)
     except Exception as e:
         logger.error("Vector search failed: {}", e)
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e)) from e
 
 
 @router.post("/hybrid", response_model=HybridSearchResponse)
@@ -79,7 +79,9 @@ async def hybrid_search(
     db: Annotated[VectorDbManager, Depends(get_vector_db)],
 ) -> HybridSearchResponse:
     if not body.query_vector:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="query_vector is required")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="query_vector is required"
+        )
 
     try:
         targets = body.backends or list(db.backends.keys())
@@ -108,4 +110,4 @@ async def hybrid_search(
         return HybridSearchResponse(results=all_results)
     except Exception as e:
         logger.error("Hybrid search failed: {}", e)
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e)) from e
