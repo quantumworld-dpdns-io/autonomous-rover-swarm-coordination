@@ -45,7 +45,9 @@ async def vector_search(
     db: Annotated[VectorDbManager, Depends(get_vector_db)],
 ) -> VectorSearchResponse:
     if not body.query_vector:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="query_vector is required")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="query_vector is required"
+        )
     if len(body.backends) == 0 and body.backend is not None:
         body.backend = body.backend or None
 
