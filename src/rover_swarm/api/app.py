@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import time
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +16,7 @@ from rover_swarm.config import Settings
 from rover_swarm.exceptions import AuthenticationError, AuthorizationError, RateLimitError
 
 try:
-    from prometheus_client import Counter, Gauge, Histogram, generate_latest, REGISTRY
+    from prometheus_client import REGISTRY, Counter, Gauge, Histogram, generate_latest
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:

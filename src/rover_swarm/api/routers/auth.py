@@ -6,7 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 from pydantic import BaseModel
 
-from rover_swarm.api.dependencies import get_current_user, get_jwt_provider, get_optional_user, get_rbac_provider
+from rover_swarm.api.dependencies import (
+    get_current_user,
+    get_jwt_provider,
+    get_rbac_provider,
+)
 from rover_swarm.exceptions import AuthenticationError
 from rover_swarm.security.auth import JwtAuthProvider, RbacProvider, Role, UserIdentity
 

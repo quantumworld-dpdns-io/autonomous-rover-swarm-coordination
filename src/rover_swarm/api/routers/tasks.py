@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from rover_swarm.api.dependencies import get_rover_state
 from rover_swarm.crdt.swarm_state import SwarmState
-from rover_swarm.swarm.task_allocation import TaskAllocationEngine, TaskAssignment
+from rover_swarm.swarm.task_allocation import TaskAllocationEngine
 from rover_swarm.types import Task, TaskStatus, TaskType
 
 router = APIRouter(prefix="/api/v1/tasks", tags=["tasks"])

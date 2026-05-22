@@ -3,16 +3,16 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 from typing import Annotated, Any
 
-from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi import Depends, Header, HTTPException, status
 from loguru import logger
 
-from rover_swarm.config import Settings, settings as global_settings
+from rover_swarm.config import Settings
+from rover_swarm.config import settings as global_settings
 from rover_swarm.crdt.swarm_state import SwarmState
-from rover_swarm.exceptions import AuthenticationError, AuthorizationError
+from rover_swarm.exceptions import AuthenticationError
 from rover_swarm.security import AuthMiddleware, JwtAuthProvider, Permission, RbacProvider
 from rover_swarm.security.auth import JwtConfig, UserIdentity
 from rover_swarm.vector_db import VectorDbManager
-
 
 _settings = global_settings
 

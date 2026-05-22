@@ -8,8 +8,7 @@ from typing import Any
 from fastapi import WebSocket, WebSocketDisconnect
 from loguru import logger
 
-from rover_swarm.api.dependencies import get_jwt_provider, get_rover_state, get_settings
-from rover_swarm.crdt.swarm_state import SwarmState
+from rover_swarm.api.dependencies import get_jwt_provider, get_rover_state
 from rover_swarm.exceptions import AuthenticationError
 
 
@@ -109,7 +108,7 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                 msg = json.loads(data)
                 if msg.get("type") == "ping":
                     await websocket.send_json({"type": "pong"})
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             await _manager.broadcast_swarm({
@@ -145,7 +144,7 @@ async def websocket_rover(websocket: WebSocket, rover_id: str) -> None:
                 msg = json.loads(data)
                 if msg.get("type") == "ping":
                     await websocket.send_json({"type": "pong"})
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             rover = state.get_rover(rover_id)
@@ -197,7 +196,7 @@ async def websocket_alerts(websocket: WebSocket) -> None:
 
 __all__ = [
     "ConnectionManager",
+    "websocket_alerts",
     "websocket_endpoint",
     "websocket_rover",
-    "websocket_alerts",
 ]
