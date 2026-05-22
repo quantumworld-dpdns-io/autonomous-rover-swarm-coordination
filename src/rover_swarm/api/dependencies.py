@@ -55,7 +55,7 @@ async def get_current_user(
         logger.debug("Authenticated user: {}", user.user_id)
         return user
     except AuthenticationError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)) from e
 
 
 async def get_optional_user(
@@ -73,7 +73,9 @@ async def get_optional_user(
 
 
 def require_permission(*permissions: Permission):
-    async def permission_dependency(current_user: Annotated[UserIdentity, Depends(get_current_user)]) -> UserIdentity:
+    async def permission_dependency(
+        current_user: Annotated[UserIdentity, Depends(get_current_user)],
+    ) -> UserIdentity:
         for permission in permissions:
             if not _rbac_provider.has_permission(current_user.user_id, permission):
                 raise HTTPException(
