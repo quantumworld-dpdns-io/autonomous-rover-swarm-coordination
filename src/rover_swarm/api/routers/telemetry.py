@@ -29,8 +29,8 @@ class TelemetryResponse(BaseModel):
 @router.get("/rovers/{rover_id}/telemetry", response_model=TelemetryResponse)
 async def get_rover_telemetry(
     rover_id: str,
-    limit: Annotated[int, Query(ge=1, le=1000)] = 100,
     state: Annotated[SwarmState, Depends(get_rover_state)],
+    limit: Annotated[int, Query(ge=1, le=1000)] = 100,
 ) -> TelemetryResponse:
     rover = state.get_rover(rover_id)
     if rover is None:
