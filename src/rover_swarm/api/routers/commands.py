@@ -38,7 +38,9 @@ async def send_rover_command(
 ) -> CommandResponse:
     rover = state.get_rover(rover_id)
     if rover is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Rover {rover_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Rover {rover_id} not found"
+        )
 
     command_id = f"cmd-{rover_id}-{int(time.time() * 1000)}"
 
@@ -82,7 +84,7 @@ async def send_rover_command(
         )
     except Exception as e:
         logger.error("Failed to send command to rover {}: {}", rover_id, e)
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e)) from e
 
 
 @router.post("/swarm/commands", response_model=list[CommandResponse], status_code=status.HTTP_202_ACCEPTED)
