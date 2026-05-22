@@ -60,7 +60,9 @@ async def list_tasks(
     for task in list(engine._tasks.values()):  # type: ignore[attr-defined]
         result.append(TaskResponse(
             task_id=task.task_id,
-            task_type=task.task_type.value if hasattr(task.task_type, "value") else str(task.task_type),
+            task_type=(
+                task.task_type.value if hasattr(task.task_type, "value") else str(task.task_type)
+            ),
             status=task.status.value if hasattr(task.status, "value") else str(task.status),
             assigned_to=task.assigned_to,
             priority=task.priority,

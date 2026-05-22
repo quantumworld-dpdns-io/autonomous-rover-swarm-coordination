@@ -82,7 +82,9 @@ async def get_rover(
 ) -> RoverDetail:
     rover = state.get_rover(rover_id)
     if rover is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Rover {rover_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Rover {rover_id} not found"
+        )
     r = rover.value()
     return RoverDetail(
         rover_id=r["rover_id"],
