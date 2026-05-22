@@ -28,7 +28,9 @@ class CommandResponse(BaseModel):
     message: str
 
 
-@router.post("/rovers/{rover_id}/commands", response_model=CommandResponse, status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/rovers/{rover_id}/commands", response_model=CommandResponse, status_code=status.HTTP_202_ACCEPTED
+)
 async def send_rover_command(
     rover_id: str,
     body: CommandRequest,

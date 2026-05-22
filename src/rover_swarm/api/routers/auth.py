@@ -85,7 +85,9 @@ async def refresh(
     try:
         payload = jwt_provider.validate_token(body.refresh_token)
         if payload.get("type") != "refresh":
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token type")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token type"
+            )
 
         user_id = payload.get("sub", "")
         role = rbac.get_role(user_id)
@@ -104,7 +106,7 @@ async def refresh(
             refresh_token=new_refresh,
         )
     except AuthenticationError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)) from e
 
 
 @router.get("/me", response_model=UserInfoResponse)
