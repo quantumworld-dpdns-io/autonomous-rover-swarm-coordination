@@ -6,7 +6,7 @@ from rover_swarm.simulation.swarm_simulator import (
 )
 from rover_swarm.simulation.hil_bridge import HilBridge, GazeboBridge, IsaacSimBridge
 from rover_swarm.simulation.visualizer import SwarmVisualizer, VisualizerConfig
-from rover_swarm.simulation.terrain import TerrainMap, Obstacle, generate_random_terrain
+from rover_swarm.simulation.terrain import TerrainMap, Obstacle, ObstacleType, generate_random_terrain
 
 __all__ = [
     "SimulatedRover",
@@ -20,5 +20,6 @@ __all__ = [
     "VisualizerConfig",
     "TerrainMap",
     "Obstacle",
+    "ObstacleType",
     "generate_random_terrain",
 ]
