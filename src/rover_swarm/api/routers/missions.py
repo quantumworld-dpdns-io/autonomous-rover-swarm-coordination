@@ -179,6 +179,9 @@ async def cancel_mission(
     planner = _get_planner()
     mission = planner.get_mission(mission_id)
     if mission is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Mission {mission_id} not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Mission {mission_id} not found",
+        )
     planner.fail_mission(mission_id, reason="Cancelled by user")
     logger.info("Mission cancelled: {}", mission_id)
