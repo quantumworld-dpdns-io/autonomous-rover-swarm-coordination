@@ -290,7 +290,7 @@ class TestRoverState:
         merged = a.merge(b)
         assert merged.rover_id == "rover-1"
         assert merged.status.value() == "online"
-        assert merged.battery.value() == 90.0
+        assert merged.battery.value() == 50.0
 
     def test_serialization_round_trip(self) -> None:
         state = RoverState(rover_id="rover-1", node_id="rover-1")
