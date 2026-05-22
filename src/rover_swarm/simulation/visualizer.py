@@ -156,7 +156,8 @@ class SwarmVisualizer:
 
         if obstacles:
             for ox, oy, radius in obstacles:
-                circle = self._plt.Circle((ox, oy), radius, color=(*[c / 255 for c in self.config.obstacle_color], 0.5))
+                rgb = [c / 255 for c in self.config.obstacle_color]
+                circle = self._plt.Circle((ox, oy), radius, color=(*rgb, 0.5))
                 self._ax.add_patch(circle)
 
         if communication_links and self.config.show_communication_links:
