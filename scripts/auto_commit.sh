@@ -37,6 +37,6 @@ while true; do
     fi
   fi
   
-  echo "Sleeping for 10 seconds..."
-  sleep 2
+  echo "Sleeping for 0.5 seconds..."
+  sleep 0.5
 done
