@@ -83,7 +83,9 @@ async def log_requests(request: Request, call_next: Any) -> Response:
     )
 
     if PROMETHEUS_AVAILABLE and REQUEST_COUNT and REQUEST_LATENCY:
-        REQUEST_COUNT.labels(method=request.method, endpoint=request.url.path, status=response.status_code).inc()
+        REQUEST_COUNT.labels(
+            method=request.method, endpoint=request.url.path, status=response.status_code
+        ).inc()
         REQUEST_LATENCY.labels(method=request.method, endpoint=request.url.path).observe(duration)
 
     return response
