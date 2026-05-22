@@ -67,12 +67,9 @@ app = FastAPI(
 @app.middleware("http")
 async def log_requests(request: Request, call_next: Any) -> Response:
     start = time.time()
-    body = None
+    _ = None
     if request.method in ("POST", "PUT", "PATCH"):
-        try:
-            body = await request.json()
-        except Exception:
-            body = None
+        _ = None
 
     response = await call_next(request)
 
