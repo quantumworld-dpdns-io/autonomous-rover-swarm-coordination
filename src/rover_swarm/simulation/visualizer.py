@@ -195,6 +195,6 @@ class SwarmVisualizer:
     def close(self) -> None:
         if self._backend == "pygame" and self._pygame is not None:
             self._pygame.quit()
-        elif self._backend == "matplotlib":
+        elif self._backend == "matplotlib" and hasattr(self, "_plt"):
             self._plt.ioff()
             self._plt.close(self._fig)
