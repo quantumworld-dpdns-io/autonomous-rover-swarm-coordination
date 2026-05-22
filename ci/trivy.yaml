@@ -1,0 +1,81 @@
+# Trivy Configuration
+# Used for container and filesystem vulnerability scanning in rover-swarm
+
+# Scan mode
+scan:
+  # Vulnerability scanning
+  vulnerability:
+    enabled: true
+    severity:
+      - CRITICAL
+      - HIGH
+      - MEDIUM
+      - LOW
+
+  # Secret scanning
+  secret:
+    enabled: true
+    # Custom secret rules can be added here
+    # allow-rules: []
+    # block-rules: []
+
+  # Misconfiguration scanning
+  misconfiguration:
+    enabled: true
+    # Include all built-in checks
+    # checks: []
+
+# Vulnerability database
+db:
+  # Always update the vulnerability database to latest
+  no-progress: true
+  repository:
+    - ghcr.io/aquasecurity/trivy-db:2
+    - ghcr.io/aquasecurity/trivy-java-db:1
+
+# Output formatting
+format:
+  # Default format is table; CI uses sarif or json
+  template: "@contrib/sarif.tpl"
+
+# Caching
+cache:
+  # Use local filesystem cache
+  dir: .trivy-cache/
+  # Clear cache before scan to ensure freshness
+  clear: false
+
+# Package scanning
+pkg:
+  types:
+    - os
+    - library
+  # Include dev dependencies in scan
+  dev-dependencies: true
+
+# Ignore known but accepted vulnerabilities
+ignorefile: .trivyignore
+
+# Vulnerability filtering
+vulnerability:
+  # Ignore unfixed vulnerabilities (still report, but can be filtered)
+  ignore-unfixed: false
+
+# Timeouts
+timeout: 10m
+
+# Custom rules and policies
+# policy:
+#   policies:
+#     - ./ci/policies/
+
+# Severity overrides can be specified per CVE
+# severity-overrides:
+#   CVE-2023-XXXXX: LOW
+
+# Reporting options
+report:
+  # Show suppressed vulnerabilities
+  show-suppressed: true
+  # Dependency tree output
+  dependency-tree: false

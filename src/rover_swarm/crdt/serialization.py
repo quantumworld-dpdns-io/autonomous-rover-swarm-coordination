@@ -13,6 +13,9 @@ from rover_swarm.crdt.mvreg import MvReg
 from rover_swarm.crdt.orset import OrSet
 from rover_swarm.crdt.pncounter import PnCounter
 from rover_swarm.crdt.rga import Rga
+from rover_swarm.crdt.rover_state import RoverState
+from rover_swarm.crdt.swarm_state import SwarmState
+from rover_swarm.crdt.mission_state import MissionState
 from rover_swarm.exceptions import CrdtSerializationError
 
 CRDT_TYPE_MAP: dict[str, type[Crdt]] = {
@@ -24,6 +27,9 @@ CRDT_TYPE_MAP: dict[str, type[Crdt]] = {
     "LwwMap": LwwMap,
     "MvReg": MvReg,
     "Rga": Rga,
+    "RoverState": RoverState,
+    "SwarmState": SwarmState,
+    "MissionState": MissionState,
 }
 
 

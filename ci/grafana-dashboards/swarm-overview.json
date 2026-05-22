@@ -1,0 +1,595 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "dashboard": {
+    "title": "Swarm Overview",
+    "description": "Real-time monitoring dashboard for the autonomous rover swarm coordination platform. Tracks rover health, communication, CRDT state, and system metrics.",
+    "tags": ["rover-swarm", "monitoring", "observability"],
+    "timezone": "browser",
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 1,
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"],
+      "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+    },
+    "panels": [
+      {
+        "title": "Active Rovers",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 3, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "count(rover_swarm_rover_info{status=\"online\"})",
+            "legendFormat": "Online",
+            "refId": "A"
+          }
+        ],
+        "description": "Number of rovers currently online in the swarm",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": null },
+                { "color": "yellow", "value": 1 },
+                { "color": "green", "value": 3 }
+              ]
+            },
+            "unit": "none",
+            "mappings": [],
+            "min": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "title": "Total Rovers",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 3, "x": 3, "y": 0 },
+        "targets": [
+          {
+            "expr": "count(rover_swarm_rover_info)",
+            "legendFormat": "Total",
+            "refId": "A"
+          }
+        ],
+        "description": "Total number of registered rovers in the swarm",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "blue", "value": null },
+                { "color": "green", "value": 1 }
+              ]
+            },
+            "unit": "none",
+            "mappings": [],
+            "min": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "title": "Messages per Second",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 3, "x": 6, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(rover_swarm_mqtt_messages_total[1m])",
+            "legendFormat": "MPS",
+            "refId": "A"
+          }
+        ],
+        "description": "Rate of MQTT messages flowing through the swarm",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 100 },
+                { "color": "red", "value": 500 }
+              ]
+            },
+            "unit": "cps",
+            "mappings": [],
+            "min": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "title": "Average Battery",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 3, "x": 9, "y": 0 },
+        "targets": [
+          {
+            "expr": "avg(rover_swarm_rover_battery_level)",
+            "legendFormat": "Avg Battery",
+            "refId": "A"
+          }
+        ],
+        "description": "Average battery level across all rovers in the swarm",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": null },
+                { "color": "yellow", "value": 20 },
+                { "color": "green", "value": 50 }
+              ]
+            },
+            "unit": "percent",
+            "mappings": [],
+            "min": 0,
+            "max": 100
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "title": "Network Latency",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 3, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "avg(rover_swarm_network_latency_ms)",
+            "legendFormat": "Latency",
+            "refId": "A"
+          }
+        ],
+        "description": "Average network latency across the swarm in milliseconds",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 50 },
+                { "color": "red", "value": 150 }
+              ]
+            },
+            "unit": "ms",
+            "mappings": [],
+            "min": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "title": "CRDT Merge Conflicts",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 3, "x": 15, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(rover_swarm_crdt_merge_conflicts_total[5m])",
+            "legendFormat": "Conflicts/min",
+            "refId": "A"
+          }
+        ],
+        "description": "Rate of CRDT merge conflicts being resolved",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 10 },
+                { "color": "red", "value": 50 }
+              ]
+            },
+            "unit": "cpm",
+            "mappings": [],
+            "min": 0
+          }
+        },
+        "options": {
+          "colorMode": "background",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        }
+      },
+      {
+        "title": "Rover Battery Levels",
+        "type": "bargauge",
+        "gridPos": { "h": 8, "w": 6, "x": 0, "y": 4 },
+        "targets": [
+          {
+            "expr": "rover_swarm_rover_battery_level",
+            "legendFormat": "{{rover_id}}",
+            "refId": "A"
+          }
+        ],
+        "description": "Battery level distribution across all rovers",
+        "fieldConfig": {
+          "defaults": {
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": null },
+                { "color": "yellow", "value": 20 },
+                { "color": "green", "value": 50 }
+              ]
+            },
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "options": {
+          "orientation": "horizontal",
+          "displayMode": "gradient",
+          "showUnfilled": true,
+          "minVizHeight": 10,
+          "maxVizHeight": 50
+        }
+      },
+      {
+        "title": "Message Throughput",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 12, "x": 6, "y": 4 },
+        "targets": [
+          {
+            "expr": "rate(rover_swarm_mqtt_messages_total[1m])",
+            "legendFormat": "Messages/s",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(rover_swarm_grpc_requests_total[1m])",
+            "legendFormat": "gRPC req/s",
+            "refId": "B"
+          },
+          {
+            "expr": "rate(rover_swarm_websocket_messages_total[1m])",
+            "legendFormat": "WS msg/s",
+            "refId": "C"
+          }
+        ],
+        "description": "Message throughput across all communication protocols",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "cps",
+            "custom": {
+              "showPoints": "never",
+              "lineInterpolation": "smooth"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "show": true,
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "multi"
+          }
+        }
+      },
+      {
+        "title": "Rover Positions",
+        "type": "geomap",
+        "gridPos": { "h": 12, "w": 12, "x": 0, "y": 12 },
+        "targets": [
+          {
+            "expr": "rover_swarm_rover_position",
+            "legendFormat": "{{rover_id}}",
+            "refId": "A"
+          }
+        ],
+        "description": "Geographic positions of all rovers in the swarm",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "hideFrom": { "legend": false, "tooltip": false, "viz": false }
+            }
+          }
+        },
+        "options": {
+          "mapCenter": { "lat": 34.0522, "lng": -118.2437 },
+          "defaultZoom": 10,
+          "showLegend": true,
+          "controls": {
+            "showZoom": true,
+            "showAttribution": true
+          },
+          "tooltip": {
+            "mode": "details"
+          }
+        }
+      },
+      {
+        "title": "CRDT State Size",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 12 },
+        "targets": [
+          {
+            "expr": "rover_swarm_crdt_state_size_bytes",
+            "legendFormat": "{{rover_id}}",
+            "refId": "A"
+          }
+        ],
+        "description": "CRDT state size per rover over time",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "custom": {
+              "showPoints": "never",
+              "lineInterpolation": "smooth"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "show": true,
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "multi"
+          }
+        }
+      },
+      {
+        "title": "CPU Usage per Rover",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 0, "y": 24 },
+        "targets": [
+          {
+            "expr": "rover_swarm_cpu_usage_percent",
+            "legendFormat": "{{rover_id}}",
+            "refId": "A"
+          }
+        ],
+        "description": "CPU utilization percentage per rover",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "custom": {
+              "showPoints": "never",
+              "lineInterpolation": "smooth"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 70 },
+                { "color": "red", "value": 90 }
+              ]
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "show": true,
+            "placement": "right"
+          },
+          "tooltip": {
+            "mode": "multi"
+          }
+        }
+      },
+      {
+        "title": "Memory Usage per Rover",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 8, "y": 24 },
+        "targets": [
+          {
+            "expr": "rover_swarm_memory_usage_bytes",
+            "legendFormat": "{{rover_id}}",
+            "refId": "A"
+          }
+        ],
+        "description": "Memory usage in bytes per rover",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "custom": {
+              "showPoints": "never",
+              "lineInterpolation": "smooth"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "show": true,
+            "placement": "right"
+          },
+          "tooltip": {
+            "mode": "multi"
+          }
+        }
+      },
+      {
+        "title": "Error Rate per Second",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 },
+        "targets": [
+          {
+            "expr": "rate(rover_swarm_errors_total[1m])",
+            "legendFormat": "{{rover_id}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "description": "Error rates across the swarm",
+        "fieldConfig": {
+          "defaults": {
+            "unit": "cps",
+            "custom": {
+              "showPoints": "never",
+              "lineInterpolation": "smooth"
+            }
+          }
+        },
+        "options": {
+          "legend": {
+            "show": true,
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "multi"
+          }
+        }
+      },
+      {
+        "title": "Swarm Events",
+        "type": "logs",
+        "gridPos": { "h": 10, "w": 12, "x": 0, "y": 32 },
+        "targets": [
+          {
+            "expr": "{job=\"rover-swarm-api\"} |= \"swarm\"",
+            "refId": "A"
+          }
+        ],
+        "description": "Live swarm event log stream",
+        "options": {
+          "showLabels": true,
+          "showTime": true,
+          "showLogLevelToggle": true,
+          "wrapLogMessage": true,
+          "sortOrder": "Descending",
+          "dedupStrategy": "none",
+          "enableLogDetails": true
+        }
+      },
+      {
+        "title": "Service Health",
+        "type": "table",
+        "gridPos": { "h": 10, "w": 12, "x": 12, "y": 32 },
+        "targets": [
+          {
+            "expr": "up",
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "description": "Health status of all monitored services and endpoints",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "align": "auto",
+              "displayMode": "color-text"
+            },
+            "mappings": [
+              { "type": "value", "value": "1", "text": "UP", "color": "green" },
+              { "type": "value", "value": "0", "text": "DOWN", "color": "red" }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "color": "red", "value": null },
+                { "color": "green", "value": 1 }
+              ]
+            }
+          }
+        },
+        "options": {
+          "sortBy": [],
+          "footer": { "show": false }
+        }
+      }
+    ],
+    "schemaVersion": 38,
+    "version": 1,
+    "links": [],
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "enable": true,
+          "expr": "rate(rover_swarm_errors_total[1m]) > 0.1",
+          "iconColor": "red",
+          "name": "Error Spikes",
+          "type": "query"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "enable": true,
+          "expr": "changes(rover_swarm_rover_info[5m]) > 0",
+          "iconColor": "yellow",
+          "name": "Rover Join/Leave",
+          "type": "query"
+        }
+      ]
+    }
+  }
+}

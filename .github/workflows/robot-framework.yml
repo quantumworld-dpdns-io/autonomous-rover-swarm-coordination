@@ -1,0 +1,177 @@
+name: Robot Framework CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/robot/**"
+      - "docker-compose.yml"
+      - "ci/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/robot/**"
+      - "docker-compose.yml"
+      - "ci/**"
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: robot-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  robot-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test-suite:
+          - api
+          - mqtt
+          - security
+          - simulation
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv pip install --system ".[dev,robot]"
+
+      - name: Set up Docker Compose environment
+        run: |
+          docker compose -f docker-compose.yml up -d --wait --wait-timeout 120
+          echo "Services started successfully"
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for MQTT broker..."
+          for i in $(seq 1 30); do
+            nc -z localhost 1883 && echo "MQTT ready" && break
+            sleep 2
+          done
+          echo "Waiting for ChromaDB..."
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8000/api/v1/heartbeat > /dev/null 2>&1 && echo "ChromaDB ready" && break
+            sleep 2
+          done
+
+      - name: Run Robot Framework tests (${{ matrix.test-suite }})
+        id: robot
+        continue-on-error: true
+        run: |
+          REPORT_DIR="reports/robot/${{ matrix.test-suite }}"
+          mkdir -p "$REPORT_DIR"
+          robot \
+            --outputdir "$REPORT_DIR" \
+            --timestampoutputs \
+            --log log.html \
+            --report report.html \
+            --output output.xml \
+            --xunit xunit.xml \
+            --variable BROKER_HOST:localhost \
+            --variable API_HOST:localhost \
+            --variable API_PORT:8080 \
+            --variable MQTT_PORT:1883 \
+            --variable WS_PORT:9001 \
+            --variable CHROMA_HOST:localhost \
+            --variable CHROMA_PORT:8000 \
+            --include ${{ matrix.test-suite }} \
+            --exclude skip-ci \
+            tests/robot/
+
+      - name: Generate combined Robot Framework report
+        if: always()
+        run: |
+          pip install robotframework-reporter || true
+          if ls reports/robot/*/output.xml 1>/dev/null 2>&1; then
+            mkdir -p reports/robot/combined
+            rebot \
+              --outputdir reports/robot/combined \
+              --name "Rover Swarm Robot Tests" \
+              --timestampoutputs \
+              reports/robot/*/output.xml \
+              --log combined-log.html \
+              --report combined-report.html \
+              --output combined-output.xml
+          fi
+
+      - name: Upload Robot Framework artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: robot-reports-${{ matrix.test-suite }}
+          path: reports/robot/${{ matrix.test-suite }}/
+          retention-days: 30
+
+      - name: Publish Robot Framework report to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: reports/robot/combined/
+          destination_dir: robot-reports/${{ github.run_id }}
+          keep_files: true
+
+      - name: Check test results
+        if: steps.robot.outcome == 'failure'
+        run: |
+          echo "❌ Robot Framework tests failed for ${{ matrix.test-suite }}"
+          echo "See detailed report in artifacts"
+          exit 1
+
+      - name: Tear down Docker Compose environment
+        if: always()
+        run: |
+          docker compose -f docker-compose.yml down -v --remove-orphans
+
+  owasp-security-tests:
+    needs: robot-tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Docker Compose environment
+        run: |
+          docker compose -f docker-compose.yml up -d --wait --wait-timeout 120
+
+      - name: Run OWASP ZAP security test suite
+        uses: zaproxy/action-api-scan@v0.12
+        with:
+          target: "http://localhost:8080/openapi.json"
+          cmd_options: "-a -j"
+          rules_file_name: ci/owasp-zap.conf
+          fail_on_alert: false
+
+      - name: Run Robot Framework security tests
+        run: |
+          mkdir -p reports/robot/security
+          robot \
+            --outputdir reports/robot/security \
+            --timestampoutputs \
+            --variable API_HOST:localhost \
+            --variable API_PORT:8080 \
+            --include security \
+            tests/robot/security/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: robot-security-reports
+          path: reports/robot/security/
+          retention-days: 60
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.yml down -v --remove-orphans
