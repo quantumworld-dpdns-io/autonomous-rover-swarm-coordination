@@ -127,7 +127,7 @@ class SwarmVisualizer:
                 self._screen.blit(label, (int(sx) + 8, int(sy) - 8))
 
         if paths and self.config.show_paths:
-            for rid, trail in paths.items():
+            for _, trail in paths.items():
                 if len(trail) < 2:
                     continue
                 pts = [_world_to_screen(p.x, p.y) for p in trail]
