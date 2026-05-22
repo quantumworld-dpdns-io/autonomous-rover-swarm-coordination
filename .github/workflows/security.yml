@@ -1,0 +1,163 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  owasp-zap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start staging environment
+        run: |
+          docker compose -f docker-compose.yml up -d --wait
+      - name: OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.12
+        with:
+          target: "http://localhost:8080"
+          cmd_options: "-a -j -I"
+          rules_file_name: ci/owasp-zap.conf
+          allow_issue_writing: false
+          fail_on_alert: false
+      - name: Generate ZAP report
+        run: |
+          mkdir -p reports/zap
+          docker run --rm -v ${{ github.workspace }}/reports:/zap/wrk softwaresecurityproject/zap-stable zap-full-scan.py \
+            -t http://host.docker.internal:8080 -r zap-report.html -w zap-report.md \
+            -z "-config rules.cookie.ignorelist=.*" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-report
+          path: reports/zap/
+          retention-days: 30
+      - name: Stop environment
+        if: always()
+        run: docker compose -f docker-compose.yml down -v
+
+  sast-full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+      - name: Install dependencies
+        run: uv pip install --system ".[dev,security]"
+      - name: Semgrep full rule set
+        run: |
+          mkdir -p reports/semgrep
+          semgrep --config=p/owasp-top-ten \
+                  --config=p/python \
+                  --config=p/command-injection \
+                  --config=p/insecure-transport \
+                  --config=p/sql-injection \
+                  --sarif --output=reports/semgrep/full-scan.sarif \
+                  src/ || true
+          semgrep --config=auto --json --output=reports/semgrep/auto-scan.json src/ || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-full-report
+          path: reports/semgrep/
+          retention-days: 60
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Generate CycloneDX SBOM
+        uses: cdrx/cyclonedx-bom-generator-py@v1
+        with:
+          output: reports/sbom/sbom.xml
+          format: xml
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          base-ref: ${{ github.event.pull_request.base.sha || 'main' }}
+          head-ref: ${{ github.sha }}
+          comment-summary-in-pr: always
+          fail-on-severity: high
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sbom
+          path: reports/sbom/
+          retention-days: 90
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: TruffleHog scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --results=verified,unknown --no-update --json
+          path: ./
+      - name: detect-secrets scan
+        uses: reviewdog/action-detect-secrets@master
+        with:
+          baseline: .secrets.baseline
+          fail_on_error: false
+      - name: Check for secrets in environment files
+        run: |
+          if grep -rE "(password|secret|token|key|credential)" .env.example 2>/dev/null; then
+            echo "WARNING: Possible secrets in .env.example"
+            exit 1
+          fi
+          echo "No secrets found in .env.example"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: secrets-scan-report
+          path: |
+            trufflehog*.json
+            .secrets.baseline
+          retention-days: 30
+
+  container-deep-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t rover-swarm:deep-scan .
+      - name: Trivy full filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: rover-swarm:deep-scan
+          format: sarif
+          output: trivy-full.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: "0"
+          scanners: vuln,secret,misconfig
+          vuln-type: os,library
+          trivy-config: ci/trivy.yaml
+      - name: Trivy vulnerability summary
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy image --severity CRITICAL,HIGH --no-progress \
+            --format json rover-swarm:deep-scan > reports/trivy/trivy-summary.json || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-full-report
+          path: reports/trivy/
+          retention-days: 60
