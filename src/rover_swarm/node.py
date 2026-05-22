@@ -47,8 +47,7 @@ class RoverNode:
         logger.info("RoverNode {} starting", self.node_id)
 
         await self.mqtt.connect()
-        self.consensus.start()
-        self.health_monitor.monitor_loop()
+        await self.consensus.start()
 
         self._tasks = [
             asyncio.create_task(self._sync_crdt_loop()),

@@ -1,0 +1,104 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    cluster: rover-swarm
+    environment: production
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+  - "alerts/*.yml"
+
+scrape_configs:
+  - job_name: "rover-swarm-api"
+    scrape_interval: 10s
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "dashboard:8080"
+        labels:
+          service: api
+          component: dashboard
+
+  - job_name: "rover-swarm-ground-station"
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - "ground-station:9090"
+        labels:
+          service: ground-station
+          component: control
+
+  - job_name: "rover-swarm-mqtt"
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "mqtt-exporter:9883"
+        labels:
+          service: mqtt
+          component: messaging
+
+  - job_name: "rover-swarm-vector-dbs"
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+          - "chroma:8000"
+          - "qdrant:6333"
+          - "weaviate:8080"
+        labels:
+          service: vector-db
+          component: storage
+
+  - job_name: "rover-swarm-simulations"
+    scrape_interval: 5s
+    scrape_timeout: 4s
+    static_configs:
+      - targets:
+          - "sim-bridge:9100"
+        labels:
+          service: simulation
+          component: sitl
+
+  - job_name: "prometheus"
+    static_configs:
+      - targets:
+          - "localhost:9090"
+
+  - job_name: "node-exporter"
+    scrape_interval: 30s
+    static_configs:
+      - targets:
+          - "node-exporter:9100"
+        labels:
+          service: infrastructure
+          component: node
+
+  - job_name: "cadvisor"
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "cadvisor:8080"
+        labels:
+          service: infrastructure
+          component: containers
+
+  - job_name: "blackbox-http"
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - https://staging.rover-swarm.example.com/health
+          - https://rover-swarm.example.com/health
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
