@@ -56,7 +56,10 @@ async def create_mission(
     planner = _get_planner()
     existing = planner.get_mission(body.mission_id)
     if existing:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Mission {body.mission_id} already exists")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Mission {body.mission_id} already exists",
+        )
     mission = planner.create_mission(
         mission_id=body.mission_id,
         name=body.name,
