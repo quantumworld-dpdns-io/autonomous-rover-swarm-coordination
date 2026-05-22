@@ -40,7 +40,7 @@ class RoverNode:
         self.consensus = ConsensusModule(node_id=node_id)
         self.health_monitor = SwarmHealthMonitor(node_id=node_id)
 
-        self._state.update_status(RoverStatus.ONLINE)
+        self.state.update_status(RoverStatus.ONLINE)
 
     async def start(self) -> None:
         self._running = True
