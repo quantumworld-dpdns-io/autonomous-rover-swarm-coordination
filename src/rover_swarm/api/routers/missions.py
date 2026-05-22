@@ -116,7 +116,7 @@ async def get_mission(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Mission {mission_id} not found",
         )
-            sv = mission.value()
+    sv = mission.value()
     return MissionResponse(
         mission_id=sv["mission_id"],
         name=sv["name"],
