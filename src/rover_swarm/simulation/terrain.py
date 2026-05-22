@@ -150,10 +150,7 @@ def generate_random_terrain(
     traversability = 1.0 - elevation
     traversability = np.clip(traversability, 0.0, 1.0)
 
-    if seed is not None:
-        rng = random.Random(seed)
-    else:
-        rng = random.Random()
+    rng = random.Random(seed) if seed is not None else random.Random()
 
     obstacles: list[Obstacle] = []
     for _ in range(num_obstacles):
