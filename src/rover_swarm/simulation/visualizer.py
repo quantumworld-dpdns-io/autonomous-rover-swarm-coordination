@@ -145,7 +145,6 @@ class SwarmVisualizer:
         paths: dict[RoverId, list[Position]] | None,
         communication_links: list[tuple[RoverId, RoverId]] | None,
         obstacles: list[tuple[float, float, float]] | None,
-        metadata: dict[RoverId, dict[str, Any]] | None,
     ) -> bool:
         if self._ax is None:
             return False
