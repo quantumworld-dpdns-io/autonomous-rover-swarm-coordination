@@ -1,24 +1,98 @@
 # OS
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
 
 # Editor
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.tox/
+nox/
+.hypothesis/
 
 # Build artifacts
 dist/
 build/
-__pycache__/
-*.pyc
-*.class
+target/
+*.whl
+*.tar.gz
 
 # Dependencies
 node_modules/
 vendor/
+.venv/
+venv/
+env/
 
 # Environment
 .env
 .env.*
 !.env.example
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# Robot Framework
+reports/
+output.xml
+log.html
+report.html
+*.robot.xml
+
+# Docker
+.docker/
+
+# Security
+.secrets.baseline
+reports/bandit*.json
+reports/safety*.json
+
+# Simulation
+*.gazebo/
+logs/
+simulation/*.log
+
+# Data
+*.db
+*.duckdb
+*.lancedb
+chroma_data/
+milvus_data/
+qdrant_data/
+weaviate_data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Profiling
+*.prof
+*.pstat

@@ -1,0 +1,11 @@
+{
+  "name": "autonomous-rover-swarm-coordination",
+  "description": "Autonomous rover swarm coordination platform using CRDTs",
+  "agents": {
+    "rover-dev": {
+      "description": "Rover swarm development agent",
+      "instructions": "Follow AGENTS.md conventions. Write type-annotated Python. CRDT-first design. Run `make lint && make typecheck && make test` before completing tasks.",
+      "tools": ["bash", "read", "edit", "write", "glob", "grep"]
+    }
+  }
+}

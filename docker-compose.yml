@@ -1,0 +1,134 @@
+services:
+  mqtt-broker:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./ci/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    networks:
+      - swarm-net
+
+  chroma:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - CHROMA_SERVER_HOST=0.0.0.0
+      - CHROMA_SERVER_PORT=8000
+    volumes:
+      - chroma-data:/chroma/chroma
+    networks:
+      - swarm-net
+
+  milvus:
+    image: milvusdb/milvus:v2.4
+    ports:
+      - "19530:19530"
+    environment:
+      - ETCD_ENDPOINTS=etcd:2379
+      - MINIO_ADDRESS=minio:9000
+    depends_on:
+      - etcd
+      - minio
+    networks:
+      - swarm-net
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+    networks:
+      - swarm-net
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - swarm-net
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - swarm-net
+
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - QUERY_DEFAULTS_LIMIT=25
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    networks:
+      - swarm-net
+
+  dashboard:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "8080:8080"
+    command: ["uvicorn", "rover_swarm.api.app:app", "--host", "0.0.0.0", "--port", "8080"]
+    depends_on:
+      - mqtt-broker
+      - chroma
+    environment:
+      - ROVER_SWARM__MQTT__BROKER=mqtt-broker:1883
+      - ROVER_SWARM__VECTOR_DB__CHROMA__HOST=chroma
+      - ROVER_SWARM__VECTOR_DB__MILVUS__HOST=milvus
+      - ROVER_SWARM__VECTOR_DB__QDRANT__HOST=qdrant
+      - ROVER_SWARM__VECTOR_DB__WEAVIATE__HOST=weaviate
+    networks:
+      - swarm-net
+    restart: unless-stopped
+
+  ground-station:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "9090:9090"
+    command: ["python", "-m", "rover_swarm", "ground-station"]
+    depends_on:
+      - mqtt-broker
+    environment:
+      - ROVER_SWARM__MQTT__BROKER=mqtt-broker:1883
+    networks:
+      - swarm-net
+    restart: unless-stopped
+
+  observability:
+    image: prom/prometheus:latest
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./ci/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - swarm-net
+
+networks:
+  swarm-net:
+    driver: bridge
+
+volumes:
+  chroma-data:
+  minio-data:
+  qdrant-data:
+  weaviate-data:
+  prometheus-data:
