@@ -172,10 +172,12 @@ class SwarmVisualizer:
                     )
 
         if paths and self.config.show_paths:
-            for rid, trail in paths.items():
+            pc = self.config.path_color
+            path_rgb = [c / 255 for c in pc]
+            for _, trail in paths.items():
                 xs = [p.x for p in trail]
                 ys = [p.y for p in trail]
-                self._ax.plot(xs, ys, color=(*[c / 255 for c in self.config.path_color], 0.6), linewidth=0.8)
+                self._ax.plot(xs, ys, color=(*path_rgb, 0.6), linewidth=0.8)
 
         for rid, pos in positions.items():
             self._ax.plot(pos.x, pos.y, "o", color=(*[c / 255 for c in self.config.rover_color], 1.0), markersize=6)
