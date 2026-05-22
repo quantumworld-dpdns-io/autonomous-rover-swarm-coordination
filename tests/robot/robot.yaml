@@ -1,0 +1,36 @@
+# Robot Framework configuration for rover swarm tests
+
+settings:
+  output_dir: /tmp/robot-reports
+
+include:
+  - unit/
+  - integration/
+  - security/
+
+resource:
+  - resources/common.robot
+  - resources/crdt_keywords.robot
+
+variables:
+  API_HOST: http://localhost:8080
+  MQTT_BROKER: localhost
+  MQTT_PORT: 1883
+  TEST_ROVER_ID_1: rover-test-1
+  TEST_ROVER_ID_2: rover-test-2
+  TEST_ROVER_ID_3: rover-test-3
+  TEST_MISSION_ID: test-mission-001
+
+listeners:
+  - name: RobotMetricsListener
+    args: []
+
+libraries:
+  - RequestsLibrary
+  - Collections
+  - CrdtLibrary.py
+
+metadata:
+  Project: rover-swarm
+  Environment: test
+  Team: swarm-coordination
