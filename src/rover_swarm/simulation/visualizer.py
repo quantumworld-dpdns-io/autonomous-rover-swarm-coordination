@@ -52,7 +52,8 @@ class SwarmVisualizer:
 
             matplotlib.use("TkAgg")
             self._plt = plt
-            self._fig, self._ax = plt.subplots(figsize=(self.config.width / 100, self.config.height / 100))
+            w, h = self.config.width / 100, self.config.height / 100
+            self._fig, self._ax = plt.subplots(figsize=(w, h))
             self._ax.set_xlim(self.config.world_bounds[0], self.config.world_bounds[2])
             self._ax.set_ylim(self.config.world_bounds[1], self.config.world_bounds[3])
             self._ax.set_aspect("equal")
