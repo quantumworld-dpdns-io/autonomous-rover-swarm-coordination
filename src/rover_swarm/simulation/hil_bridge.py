@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
-from rover_swarm.types import Position, TelemetryPacket
+from rover_swarm.types import TelemetryPacket
 
 
 @dataclass
@@ -125,8 +126,8 @@ class IsaacSimBridge(HilBridge):
 
     def connect(self) -> bool:
         try:
-            import omni.usd
             import carb
+            import omni.usd
 
             self._carb = carb
             self._omni_usd = omni.usd
