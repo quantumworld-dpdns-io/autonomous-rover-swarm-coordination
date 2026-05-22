@@ -108,7 +108,8 @@ class SwarmVisualizer:
             for ox, oy, radius in obstacles:
                 sx, sy = _world_to_screen(ox, oy)
                 sr = radius / (bx1 - bx0) * w
-                self._pygame.draw.circle(self._screen, self.config.obstacle_color, (int(sx), int(sy)), int(sr))
+                c = self.config.obstacle_color
+                self._pygame.draw.circle(self._screen, c, (int(sx), int(sy)), int(sr))
 
         if communication_links and self.config.show_communication_links:
             for rid_a, rid_b in communication_links:
