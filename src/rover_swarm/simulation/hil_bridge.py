@@ -142,10 +142,8 @@ class IsaacSimBridge(HilBridge):
         self._connected = False
         return True
 
-    def publish_state(self, packet: TelemetryPacket) -> bool:
-        if not self._connected:
-            return False
-        return True
+    def publish_state(self, _packet: TelemetryPacket) -> bool:
+        return self._connected
 
     def subscribe_sensor(self, sensor_id: str, callback: SensorCallback) -> None:
         self._callbacks.setdefault(sensor_id, []).append(callback)
