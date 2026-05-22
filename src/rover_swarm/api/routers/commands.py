@@ -90,7 +90,9 @@ async def send_rover_command(
 
 
 @router.post(
-    "/swarm/commands", response_model=list[CommandResponse], status_code=status.HTTP_202_ACCEPTED
+    "/swarm/commands",
+    response_model=list[CommandResponse],
+    status_code=status.HTTP_202_ACCEPTED,
 )
 async def broadcast_command(
     body: CommandRequest,
