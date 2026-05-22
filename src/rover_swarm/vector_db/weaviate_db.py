@@ -11,7 +11,8 @@ from rover_swarm.vector_db.base import VectorDatabase, VectorDbConfig
 
 try:
     import weaviate
-    from weaviate.classes.config import Configure, Property, DataType as WDataType
+    from weaviate.classes.config import Configure, Property
+    from weaviate.classes.config import DataType as WDataType
     from weaviate.classes.data import DataObject
 
     HAS_WEAVIATE = True

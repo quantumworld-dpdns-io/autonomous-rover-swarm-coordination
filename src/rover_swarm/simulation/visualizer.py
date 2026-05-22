@@ -180,7 +180,8 @@ class SwarmVisualizer:
                 self._ax.plot(xs, ys, color=(*path_rgb, 0.6), linewidth=0.8)
 
         for rid, pos in positions.items():
-            self._ax.plot(pos.x, pos.y, "o", color=(*[c / 255 for c in self.config.rover_color], 1.0), markersize=6)
+            rc = [c / 255 for c in self.config.rover_color]
+            self._ax.plot(pos.x, pos.y, "o", color=(*rc, 1.0), markersize=6)
             if self.config.show_rover_labels:
                 self._ax.annotate(rid, (pos.x, pos.y), xytext=(5, 5), textcoords="offset points", fontsize=8, color="white")
 
