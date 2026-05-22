@@ -1,0 +1,144 @@
+[project]
+name = "rover-swarm"
+version = "0.1.0"
+description = "Autonomous rover swarm coordination platform using CRDTs"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "quantumworld-dpdns-io"},
+]
+
+dependencies = [
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "loguru>=0.7",
+    "msgpack>=1.0",
+    "cryptography>=41.0",
+    "aiofiles>=23.0",
+    "orjson>=3.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=4.1",
+    "pytest-benchmark>=4.0",
+    "coverage>=7.4",
+    "ruff>=0.3",
+    "black>=24.0",
+    "mypy>=1.8",
+    "pre-commit>=3.6",
+    "httpx>=0.27",
+    "requests>=2.31",
+]
+security = [
+    "bandit>=1.7",
+    "safety>=3.0",
+    "pip-audit>=2.7",
+    "semgrep>=1.60",
+]
+robot = [
+    "robotframework>=7.0",
+    "robotframework-requests>=0.9",
+    "robotframework-sshlibrary>=3.8",
+    "robotframework-pabot>=2.18",
+]
+mqtt = [
+    "gmqtt>=0.6",
+    "paho-mqtt>=2.0",
+]
+grpc = [
+    "grpcio>=1.60",
+    "grpcio-tools>=1.60",
+]
+web = [
+    "fastapi>=0.109",
+    "uvicorn[standard]>=0.27",
+    "websockets>=12.0",
+    "python-multipart>=0.0.6",
+]
+simulation = [
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "shapely>=2.0",
+    "matplotlib>=3.8",
+    "pygame>=2.5",
+]
+vector-db = [
+    "chromadb>=0.4",
+    "lancedb>=0.6",
+    "pymilvus>=2.3",
+    "qdrant-client>=1.9",
+    "weaviate-client>=4.5",
+]
+ai = [
+    "ollama>=0.1",
+    "llama-cpp-python>=0.2",
+    "openai>=1.12",
+    "sglang>=0.1",
+]
+observability = [
+    "opentelemetry-api>=1.24",
+    "opentelemetry-sdk>=1.24",
+    "opentelemetry-exporter-otlp>=1.24",
+    "prometheus-client>=0.19",
+    "weave>=0.3",
+]
+data = [
+    "duckdb>=0.10",
+    "pyarrow>=15.0",
+    "polars>=0.20",
+    "sqlalchemy>=2.0",
+]
+all = [
+    "rover-swarm[dev,security,robot,mqtt,grpc,web,simulation,vector-db,ai,observability,data]",
+]
+
+[project.urls]
+homepage = "https://github.com/quantumworld-dpdns-io/autonomous-rover-swarm-coordination"
+repository = "https://github.com/quantumworld-dpdns-io/autonomous-rover-swarm-coordination"
+documentation = "https://github.com/quantumworld-dpdns-io/autonomous-rover-swarm-coordination/docs"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["rover_swarm*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "ARG", "PTH", "RUF"]
+ignore = ["ARG001", "PTH123"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_any_unimported = false
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+skip-string-normalization = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --cov=src/rover_swarm --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/rover_swarm"]
+branch = true
