@@ -24,6 +24,9 @@ CRDT_TYPE_MAP: dict[str, type[Crdt]] = {
     "LwwMap": LwwMap,
     "MvReg": MvReg,
     "Rga": Rga,
+    "RoverState": RoverState,
+    "SwarmState": SwarmState,
+    "MissionState": MissionState,
 }
 
 
