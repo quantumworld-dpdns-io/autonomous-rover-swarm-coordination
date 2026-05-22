@@ -54,7 +54,9 @@ async def login(
 ) -> TokenResponse:
     user_info = _DEMO_USERS.get(body.username)
     if user_info is None or user_info["password"] != body.password:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password"
+        )
 
     role = user_info["role"]
     user_id = body.username
