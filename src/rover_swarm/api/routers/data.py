@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -51,10 +52,12 @@ async def sql_query(
         logger.debug("SQL query returned {} rows from {} columns", len(rows), len(columns))
         return SqlQueryResponse(columns=columns, rows=rows, row_count=len(rows))
     except ImportError:
-        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="DuckDB is not installed")
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="DuckDB is not installed"
+        ) from None
     except Exception as e:
         logger.error("SQL query failed: {}", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
 @router.post("/export", response_model=ExportResponse)
@@ -62,20 +65,17 @@ async def export_data(
     body: ExportRequest,
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> ExportResponse:
-    import os
-
     output_path = body.output_path or f"/tmp/export-{hash(body.query)}.parquet"
 
     try:
         import duckdb
-        import pyarrow.parquet as pq
 
         conn = duckdb.connect(settings.data.duckdb_path)
         df = conn.execute(body.query).fetchdf()
         conn.close()
 
         df.to_parquet(output_path, index=False)
-        file_size = os.path.getsize(output_path)
+        file_size = Path(output_path).stat().st_size
 
         logger.info("Exported {} rows to {}", len(df), output_path)
         return ExportResponse(
@@ -84,7 +84,10 @@ async def export_data(
             file_size_bytes=file_size,
         )
     except ImportError:
-        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="DuckDB or PyArrow is not installed")
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="DuckDB or PyArrow is not installed",
+        ) from None
     except Exception as e:
         logger.error("Export failed: {}", e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
