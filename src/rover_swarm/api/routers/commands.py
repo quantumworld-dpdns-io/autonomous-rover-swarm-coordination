@@ -87,7 +87,9 @@ async def send_rover_command(
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(e)) from e
 
 
-@router.post("/swarm/commands", response_model=list[CommandResponse], status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/swarm/commands", response_model=list[CommandResponse], status_code=status.HTTP_202_ACCEPTED
+)
 async def broadcast_command(
     body: CommandRequest,
     state: Annotated[SwarmState, Depends(get_rover_state)],
